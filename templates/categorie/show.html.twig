@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ categorie.nom }} - Gestion Produits{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-tag"></i> {{ categorie.nom }}
+                    </h1>
+                    <div class="btn-group" role="group">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_categorie_edit', {'id': categorie.id}) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                        {% endif %}
+                        <a href="{{ path('app_categorie_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if categorie.description %}
+                    <p class="card-text">{{ categorie.description }}</p>
+                {% endif %}
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5>Informations</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Nombre de produits:</span>
+                                <span class="badge bg-primary">{{ categorie.produits|length }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>ID:</span>
+                                <span class="text-muted">{{ categorie.id }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-box"></i> Produits de cette catégorie
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if categorie.produits is empty %}
+                    <p class="text-muted">Aucun produit dans cette catégorie.</p>
+                {% else %}
+                    <div class="list-group list-group-flush">
+                        {% for produit in categorie.produits %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ produit.nom }}</h6>
+                                        <small class="text-muted">{{ produit.prix|number_format(2, ',', ' ') }} €</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-{{ produit.stock <= 5 ? 'danger' : 'success' }} rounded-pill">
+                                            Stock: {{ produit.stock }}
+                                        </span>
+                                        <a href="{{ path('app_produit_show', {'id': produit.id}) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="mt-3">
+                        <a href="{{ path('app_produit_new') }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i> Ajouter un produit
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
