@@ -14,6 +14,27 @@
     {% endif %}
 </div>
 
+<!-- Filtres par catégorie -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="card-title">
+            <i class="bi bi-funnel"></i> Filtrer par catégorie
+        </h6>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ path('app_produit_index') }}" 
+               class="btn btn-sm {{ selectedCategorie is null ? 'btn-primary' : 'btn-outline-primary' }}">
+                Toutes les catégories
+            </a>
+            {% for categorie in categories %}
+                <a href="{{ path('app_produit_index', {'categorie': categorie.id}) }}" 
+                   class="btn btn-sm {{ selectedCategorie == categorie.id ? 'btn-primary' : 'btn-outline-primary' }}">
+                    {{ categorie.nom }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
 {% if produits is empty %}
     <div class="alert alert-info">
         <i class="bi bi-info-circle"></i> Aucun produit disponible.
@@ -43,7 +64,7 @@
                         
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="h5 text-primary mb-0">{{ produit.prix|number_format(2, ',', ' ') }} €</span>
+                                <span class="h5 text-primary mb-0">{{ produit.prix|number_format(2, ',', ' ') }} FCFA</span>
                                 <br>
                                 <span class="badge bg-{{ produit.stock <= 5 ? 'danger' : 'success' }}">Stock: {{ produit.stock }}</span>
                             </div>

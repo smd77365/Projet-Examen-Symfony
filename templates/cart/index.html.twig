@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Panier{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-cart3"></i> Mon Panier
+            </h1>
+        </div>
+    </div>
+
+    {% if cart_items is empty %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Votre panier est vide.
+            <a href="{{ path('app_produit_index') }}" class="alert-link">Continuer vos achats</a>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bag"></i> Articles ({{ item_count }})
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for cart_item in cart_items %}
+                            <div class="row mb-3 align-items-center border-bottom pb-3">
+                                <div class="col-md-2">
+                                    {% if cart_item.produit.image %}
+                                        <img src="{{ asset('uploads/produits/' ~ cart_item.produit.image) }}" 
+                                             class="img-fluid rounded" alt="{{ cart_item.produit.nom }}">
+                                    {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="mb-1">{{ cart_item.produit.nom }}</h6>
+                                    <small class="text-muted">{{ cart_item.produit.categorie.nom }}</small>
+                                    <br>
+                                    <span class="text-primary fw-bold">{{ cart_item.produit.prix|number_format(2, ',', ' ') }} FCFA</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <form method="post" action="{{ path('app_cart_update', {'id': cart_item.id}) }}" class="d-flex align-items-center">
+                                        <label for="quantite-{{ cart_item.id }}" class="form-label me-2">Qté:</label>
+                                        <input type="number" 
+                                               id="quantite-{{ cart_item.id }}"
+                                               name="quantite" 
+                                               value="{{ cart_item.quantite }}" 
+                                               min="1" 
+                                               max="{{ cart_item.produit.stock }}"
+                                               class="form-control form-control-sm me-2" 
+                                               style="width: 70px;">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <span class="fw-bold">{{ cart_item.total|number_format(2, ',', ' ') }} FCFA</span>
+                                </div>
+                                <div class="col-md-1 text-end">
+                                    <form method="post" action="{{ path('app_cart_remove', {'id': cart_item.id}) }}" style="display: inline-block">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calculator"></i> Résumé
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Sous-total ({{ item_count }} articles):</span>
+                            <span class="fw-bold">{{ total|number_format(2, ',', ' ') }} FCFA</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="h5">Total:</span>
+                            <span class="h5 text-primary">{{ total|number_format(2, ',', ' ') }} FCFA</span>
+                        </div>
+                        
+                        <form method="post" action="{{ path('app_cart_checkout') }}" class="mb-2">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-circle"></i> Valider la commande
+                            </button>
+                        </form>
+                        
+                        <form method="post" action="{{ path('app_cart_clear') }}" class="mb-2">
+                            <button type="submit" class="btn btn-outline-danger w-100"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir vider votre panier ?')">
+                                <i class="bi bi-trash"></i> Vider le panier
+                            </button>
+                        </form>
+                        
+                        <a href="{{ path('app_produit_index') }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-arrow-left"></i> Continuer les achats
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

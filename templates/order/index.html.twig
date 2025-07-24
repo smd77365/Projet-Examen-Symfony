@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Commandes{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-receipt"></i> Mes Commandes
+            </h1>
+        </div>
+    </div>
+
+    {% if orders is empty %}
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Vous n'avez pas encore passé de commande.
+            <a href="{{ path('app_produit_index') }}" class="alert-link">Découvrir nos produits</a>
+        </div>
+    {% else %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Commande #{{ order.id }}</h6>
+                                <span class="badge bg-{{ order.status == 'confirmed' ? 'success' : 'warning' }}">
+                                    {{ order.status == 'confirmed' ? 'Confirmée' : 'En attente' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar"></i> {{ order.date|date('d/m/Y H:i') }}
+                                </small>
+                            </p>
+                            <p class="card-text">
+                                <strong>{{ order.orderItems|length }}</strong> article(s)
+                            </p>
+                            <p class="card-text">
+                                <span class="h5 text-primary">{{ order.total|number_format(2, ',', ' ') }} FCFA</span>
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ path('app_order_show', {'id': order.id}) }}" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-eye"></i> Voir les détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
