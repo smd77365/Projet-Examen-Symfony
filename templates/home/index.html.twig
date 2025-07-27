@@ -6,60 +6,98 @@
 <div class="row">
     <div class="col-12">
         <h1 class="mb-4">
-            <i class="bi bi-house-door"></i> Tableau de bord
+            <i class="bi bi-house-door"></i> 
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                Tableau de bord
+            {% else %}
+                Bienvenue sur notre boutique
+            {% endif %}
         </h1>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h5 class="card-title">Produits</h5>
-                        <h2 class="mb-0">{{ produits|length }}</h2>
+{% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+    <div class="alert alert-info text-center mb-4">
+        <h4><i class="bi bi-info-circle"></i> Découvrez notre catalogue !</h4>
+        <p class="mb-3">Connectez-vous ou créez un compte pour profiter de toutes les fonctionnalités : panier, commandes, et bien plus encore.</p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ path('app_login') }}" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Connexion
+            </a>
+            <a href="{{ path('app_register') }}" class="btn btn-outline-primary">
+                <i class="bi bi-person-plus"></i> Inscription
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Produits</h5>
+                                <h2 class="mb-0">{{ produits|length }}</h2>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-box fs-1"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="align-self-center">
-                        <i class="bi bi-box fs-1"></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Catégories</h5>
+                                <h2 class="mb-0">{{ categories|length }}</h2>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-tags fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Stock Faible</h5>
+                                <h2 class="mb-0">{{ produitsLowStock|length }}</h2>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-exclamation-triangle fs-1"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h5 class="card-title">Catégories</h5>
-                        <h2 class="mb-0">{{ categories|length }}</h2>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="bi bi-tags fs-1"></i>
-                    </div>
-                </div>
+    {% else %}
+        <div class="alert alert-info mb-4">
+            Bienvenue {{ app.user.email }} ! Retrouvez ici vos produits favoris, votre panier et vos commandes.
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <a href="{{ path('app_cart_index') }}" class="btn btn-primary w-100 mb-3">
+                    <i class="bi bi-cart3"></i> Mon panier
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="{{ path('app_order_index') }}" class="btn btn-success w-100 mb-3">
+                    <i class="bi bi-receipt"></i> Mes commandes
+                </a>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h5 class="card-title">Stock Faible</h5>
-                        <h2 class="mb-0">{{ produitsLowStock|length }}</h2>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="bi bi-exclamation-triangle fs-1"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    {% endif %}
+{% endif %}
 
 <div class="row">
     <div class="col-md-6">
@@ -125,13 +163,17 @@
                                     <small class="text-muted">{{ produit.categorie.nom }} - {{ produit.prix|number_format(2, ',', ' ') }} FCFA</small>
                                 </div>
                                 <div>
-                                    <span class="badge bg-{{ produit.stock <= 5 ? 'danger' : 'success' }} rounded-pill">
-                                        Stock: {{ produit.stock }}
-                                    </span>
                                     {% if is_granted('ROLE_USER') %}
+                                        <span class="badge bg-{{ produit.stock <= 5 ? 'danger' : 'success' }} rounded-pill">
+                                            Stock: {{ produit.stock }}
+                                        </span>
                                         <a href="{{ path('app_produit_show', {'id': produit.id}) }}" class="btn btn-sm btn-outline-primary ms-2">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                    {% else %}
+                                        <span class="text-muted">
+                                            <i class="bi bi-lock"></i> Connectez-vous pour voir
+                                        </span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -150,6 +192,39 @@
         </div>
     </div>
 </div>
+
+{% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star"></i> Pourquoi s'inscrire ?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-cart3 text-primary" style="font-size: 2rem;"></i>
+                            <h6 class="mt-2">Panier personnalisé</h6>
+                            <p class="text-muted">Ajoutez vos produits favoris et gérez votre panier</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-receipt text-success" style="font-size: 2rem;"></i>
+                            <h6 class="mt-2">Suivi des commandes</h6>
+                            <p class="text-muted">Consultez l'historique de vos achats</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-shield-check text-info" style="font-size: 2rem;"></i>
+                            <h6 class="mt-2">Paiement sécurisé</h6>
+                            <p class="text-muted">Vos données sont protégées</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 {% if produitsLowStock is not empty and is_granted('ROLE_ADMIN') %}
 <div class="row mt-4">
